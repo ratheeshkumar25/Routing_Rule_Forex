@@ -1,0 +1,253 @@
+definitions:
+  models.RoutingRule:
+    properties:
+      conditions:
+        items:
+          $ref: '#/definitions/models.RuleCondition'
+        type: array
+      dealer_id:
+        description: Associated Dealer
+        type: integer
+      enabled:
+        type: boolean
+      id:
+        type: integer
+      order_type:
+        $ref: '#/definitions/models.RuleOrder'
+      performance:
+        $ref: '#/definitions/models.RulePerformanceAction'
+      priority:
+        type: integer
+      request_type:
+        $ref: '#/definitions/models.RuleRequest'
+      rule_name:
+        type: string
+      trader_id:
+        description: Associated Trader
+        type: integer
+    type: object
+  models.RuleCondition:
+    properties:
+      operator:
+        $ref: '#/definitions/models.RuleOperator'
+      type:
+        $ref: '#/definitions/models.RuleConditionType'
+      value:
+        description: Flexible to accommodate multiple types
+    type: object
+  models.RuleConditionType:
+    enum:
+    - all
+    - request
+    - account
+    - order
+    - statistics
+    - symbol
+    type: string
+    x-enum-varnames:
+    - RuleConditionType_All
+    - RuleConditionType_Request
+    - RuleConditionType_Account
+    - RuleConditionType_Order
+    - RuleConditionType_Statistics
+    - RuleConditionType_Symbol
+  models.RuleOperator:
+    enum:
+    - =
+    - '!='
+    - '>'
+    - '>='
+    - <
+    - <=
+    type: string
+    x-enum-varnames:
+    - OperatorEqual
+    - OperatorNotEqual
+    - OperatorGreaterThan
+    - OperatorGreaterEqual
+    - OperatorLessThan
+    - OperatorLessEqual
+  models.RuleOrder:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    type: integer
+    x-enum-varnames:
+    - RuleOrder_All
+    - RuleOrder_Buy
+    - RuleOrder_Sell
+    - RuleOrder_BuyLimit
+    - RuleOrder_SellLimit
+    - RuleOrder_BuyStop
+    - RuleOrder_SellStop
+    - RuleOrder_BuyStopLimit
+    - RuleOrder_SellStopLimit
+  models.RulePerformanceAction:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    type: integer
+    x-enum-varnames:
+    - RulePerformanceAction_All
+    - RulePerformanceAction_DelayInMilliseconds
+    - RulePerformanceAction_DelayInTicks
+    - RulePerformanceAction_Reject
+    - RulePerformanceAction_ConfirmByPrice
+    - RulePerformanceAction_ConfirmByMarket
+    - RulePerformanceAction_CancelOrder
+  models.RuleRequest:
+    enum:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    type: integer
+    x-enum-varnames:
+    - RuleRequest_All
+    - RuleRequest_Price
+    - RuleRequest_MarketExecution
+    - RuleRequest_InstantExecution
+    - RuleRequest_PendingOrders
+    - RuleRequest_SLTPModification
+    - RuleRequest_RequestExecution
+    - RuleRequest_SLActivation
+info:
+  contact: {}
+paths:
+  /api/v1/rules:
+    get:
+      description: Retrieve routing rules filtered by dealer or trader ID
+      parameters:
+      - description: Dealer ID
+        in: query
+        name: dealer_id
+        type: integer
+      - description: Trader ID
+        in: query
+        name: trader_id
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.RoutingRule'
+            type: array
+      summary: Get routing rules
+      tags:
+      - Rules
+    post:
+      consumes:
+      - application/json
+      description: Create a new routing rule for a dealer or trader
+      parameters:
+      - description: Routing Rule
+        in: body
+        name: rule
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoutingRule'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.RoutingRule'
+        "400":
+          description: Invalid Payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add a new routing rule
+      tags:
+      - Rules
+  /api/v1/rules/{id}:
+    delete:
+      description: Remove a routing rule by ID
+      parameters:
+      - description: Rule ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Invalid Rule ID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Rule Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Delete a routing rule
+      tags:
+      - Rules
+    put:
+      consumes:
+      - application/json
+      description: Update the details of an existing routing rule
+      parameters:
+      - description: Rule ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated Routing Rule
+        in: body
+        name: rule
+        required: true
+        schema:
+          $ref: '#/definitions/models.RoutingRule'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.RoutingRule'
+        "400":
+          description: Invalid Rule ID or Payload
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Rule Not Found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a routing rule
+      tags:
+      - Rules
+swagger: "2.0"

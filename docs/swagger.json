@@ -1,0 +1,353 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/v1/rules": {
+            "get": {
+                "description": "Retrieve routing rules filtered by dealer or trader ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rules"
+                ],
+                "summary": "Get routing rules",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Dealer ID",
+                        "name": "dealer_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Trader ID",
+                        "name": "trader_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.RoutingRule"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create a new routing rule for a dealer or trader",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rules"
+                ],
+                "summary": "Add a new routing rule",
+                "parameters": [
+                    {
+                        "description": "Routing Rule",
+                        "name": "rule",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RoutingRule"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/models.RoutingRule"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Payload",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/rules/{id}": {
+            "put": {
+                "description": "Update the details of an existing routing rule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rules"
+                ],
+                "summary": "Update a routing rule",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Rule ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Routing Rule",
+                        "name": "rule",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.RoutingRule"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.RoutingRule"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Rule ID or Payload",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rule Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Remove a routing rule by ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rules"
+                ],
+                "summary": "Delete a routing rule",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Rule ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid Rule ID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rule Not Found",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.RoutingRule": {
+            "type": "object",
+            "properties": {
+                "conditions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.RuleCondition"
+                    }
+                },
+                "dealer_id": {
+                    "description": "Associated Dealer",
+                    "type": "integer"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "order_type": {
+                    "$ref": "#/definitions/models.RuleOrder"
+                },
+                "performance": {
+                    "$ref": "#/definitions/models.RulePerformanceAction"
+                },
+                "priority": {
+                    "type": "integer"
+                },
+                "request_type": {
+                    "$ref": "#/definitions/models.RuleRequest"
+                },
+                "rule_name": {
+                    "type": "string"
+                },
+                "trader_id": {
+                    "description": "Associated Trader",
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RuleCondition": {
+            "type": "object",
+            "properties": {
+                "operator": {
+                    "$ref": "#/definitions/models.RuleOperator"
+                },
+                "type": {
+                    "$ref": "#/definitions/models.RuleConditionType"
+                },
+                "value": {
+                    "description": "Flexible to accommodate multiple types"
+                }
+            }
+        },
+        "models.RuleConditionType": {
+            "type": "string",
+            "enum": [
+                "all",
+                "request",
+                "account",
+                "order",
+                "statistics",
+                "symbol"
+            ],
+            "x-enum-varnames": [
+                "RuleConditionType_All",
+                "RuleConditionType_Request",
+                "RuleConditionType_Account",
+                "RuleConditionType_Order",
+                "RuleConditionType_Statistics",
+                "RuleConditionType_Symbol"
+            ]
+        },
+        "models.RuleOperator": {
+            "type": "string",
+            "enum": [
+                "=",
+                "!=",
+                "\u003e",
+                "\u003e=",
+                "\u003c",
+                "\u003c="
+            ],
+            "x-enum-varnames": [
+                "OperatorEqual",
+                "OperatorNotEqual",
+                "OperatorGreaterThan",
+                "OperatorGreaterEqual",
+                "OperatorLessThan",
+                "OperatorLessEqual"
+            ]
+        },
+        "models.RuleOrder": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8
+            ],
+            "x-enum-varnames": [
+                "RuleOrder_All",
+                "RuleOrder_Buy",
+                "RuleOrder_Sell",
+                "RuleOrder_BuyLimit",
+                "RuleOrder_SellLimit",
+                "RuleOrder_BuyStop",
+                "RuleOrder_SellStop",
+                "RuleOrder_BuyStopLimit",
+                "RuleOrder_SellStopLimit"
+            ]
+        },
+        "models.RulePerformanceAction": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6
+            ],
+            "x-enum-varnames": [
+                "RulePerformanceAction_All",
+                "RulePerformanceAction_DelayInMilliseconds",
+                "RulePerformanceAction_DelayInTicks",
+                "RulePerformanceAction_Reject",
+                "RulePerformanceAction_ConfirmByPrice",
+                "RulePerformanceAction_ConfirmByMarket",
+                "RulePerformanceAction_CancelOrder"
+            ]
+        },
+        "models.RuleRequest": {
+            "type": "integer",
+            "enum": [
+                0,
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7
+            ],
+            "x-enum-varnames": [
+                "RuleRequest_All",
+                "RuleRequest_Price",
+                "RuleRequest_MarketExecution",
+                "RuleRequest_InstantExecution",
+                "RuleRequest_PendingOrders",
+                "RuleRequest_SLTPModification",
+                "RuleRequest_RequestExecution",
+                "RuleRequest_SLActivation"
+            ]
+        }
+    }
+}
